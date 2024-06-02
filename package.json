@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "build": "npx playwright install"
+  },
+  "dependencies": {
+    "playwright": "^1.42.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.44.1"
+  }
+}

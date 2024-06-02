@@ -7,7 +7,6 @@ import logging
 setup_logging()
 logger = logging.getLogger()
 
-
 class WebDriver:
     """
     A singleton class representing a web driver instance.
@@ -93,7 +92,7 @@ class WebDriver:
             )
             self.playwright = playwright
             self.browser = browser
-            self.page = browser.new_page()
+            self.page = self.browser.pages[0] if self.browser.pages else self.browser.new_page()
             self.page.set_viewport_size({"width": 960, "height": 1080})
             logger.info("Browser instance created successfully.")
         except Exception as e:

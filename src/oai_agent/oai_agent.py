@@ -1,3 +1,6 @@
+from http.server import BaseHTTPRequestHandler
+import logging
+
 from src.configs.logging.logging_config import setup_logging
 from src.oai_agent.utils.load_assistant_id import load_assistant_id
 from src.oai_agent.utils.create_oai_agent import create_agent
@@ -13,7 +16,6 @@ from src.tools.analyze_content import analyze_content
 from src.tools.save_to_file import save_to_file
 from src.oai_agent.utils.prompt import prompt
 
-import logging
 import autogen
 from autogen.agentchat import AssistantAgent
 from autogen.agentchat.contrib.gpt_assistant_agent import GPTAssistantAgent
@@ -22,7 +24,6 @@ import openai
 
 setup_logging()
 logger = logging.getLogger(__name__)
-
 
 def configure_agent(assistant_type: str) -> GPTAssistantAgent:
     """
@@ -38,6 +39,7 @@ def configure_agent(assistant_type: str) -> GPTAssistantAgent:
         logger.info("Configuring GPT Assistant Agent...")
         assistant_id = load_assistant_id(assistant_type)
         llm_config = GetConfig().config_list
+        logger.info(llm_config)
         oai_config = {
             "config_list": llm_config["config_list"], "assistant_id": assistant_id}
         gpt_assistant = GPTAssistantAgent(
@@ -48,11 +50,10 @@ def configure_agent(assistant_type: str) -> GPTAssistantAgent:
     except openai.NotFoundError:
         logger.warning("Assistant not found. Creating new assistant...")
         create_agent(assistant_type)
-        return configure_agent()
+        return configure_agent(assistant_type)
     except Exception as e:
         logger.error(f"Unexpected error during agent configuration: {str(e)}")
         raise
-
 
 def register_functions(agent):
     """
@@ -79,7 +80,6 @@ def register_functions(agent):
     agent.register_function(function_map=function_map)
     logger.info("Functions registered.")
 
-
 def create_user_proxy():
     """
     Create a User Proxy Agent.
@@ -103,7 +103,6 @@ def create_user_proxy():
     logger.info("User Proxy Agent created.")
     return user_proxy
 
-
 def main():
     """
     Main function to run the GPT Assistant Agent.
@@ -123,6 +122,17 @@ def main():
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}")
 
+class handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        try:
+            main()
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write('Agent executed successfully'.encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write(f'An error occurred: {str(e)}'.encode('utf-8'))
 
-if __name__ == "__main__":
-    main()

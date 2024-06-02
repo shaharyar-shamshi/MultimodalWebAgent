@@ -1,0 +1,15 @@
+{
+  "builds": [
+    {
+      "src": "src/oai_agent/oai_agent.py",
+      "use": "@vercel/python",
+      "config": { "maxLambdaSize": "100mb" }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "src/oai_agent/oai_agent.py"
+    }
+  ]
+}

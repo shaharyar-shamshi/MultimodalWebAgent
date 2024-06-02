@@ -3,7 +3,6 @@ import autogen
 from autogen import config_list_from_json
 import logging
 from dotenv import load_dotenv
-
 import os
 
 setup_logging()
@@ -43,8 +42,11 @@ class GetConfig:
         """
         logger.info('Initializing GetConfig class')
         self.api_key = os.environ.get('OPENAI_API_KEY', '')
+        self.model = os.environ.get('OPENAI_MODEL', '')
         if not self.api_key:
             logger.error('OPENAI_API_KEY not found in environment variables')
+        if not self.model:
+            logger.error('OPENAI_MODEL not found in environment variables')
         self.config_list = self.load_and_enrich_config_list()
 
     @property
@@ -76,12 +78,13 @@ class GetConfig:
         try:
             config_list = config_list_from_json(
                 env_or_file=config_path,
-                filter_dict={"model": os.environ.get('OPENAI_MODEL', '')}
+                filter_dict={"model": self.model}
             )
             logger.info('Config list loaded successfully')
             for config in config_list:
                 config['api_key'] = self.api_key
-            logger.info('Config list enriched with API key')
+                config['model'] = self.model  # Ensure model is also set in the config
+            logger.info('Config list enriched with API key and model')
         except Exception as e:
             logger.error(
                 "Failed to load or enrich the config list.", exc_info=e)
@@ -89,5 +92,6 @@ class GetConfig:
         return {'config_list': config_list}
 
 
-# test
+# Test
 config = GetConfig()
+print(config.config_list)
