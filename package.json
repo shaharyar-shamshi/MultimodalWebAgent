@@ -1,7 +1,6 @@
 {
   "scripts": {
-    "build": "npx playwright install",
-    "postinstall": "./script.sh && playwright install"
+    "build": "npx playwright install"
   },
   "dependencies": {
     "playwright": "^1.42.0"
