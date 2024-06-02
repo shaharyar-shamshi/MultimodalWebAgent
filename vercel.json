@@ -2,7 +2,7 @@
   "functions": {
     "api/oai_agent.py": { "maxDuration": 60 }
   },
-  "buildCommand": "playwright install --with-deps",
+  "buildCommand": "./script.sh && playwright install --with-deps",
   "routes": [
     {
       "src": "/(.*)",
