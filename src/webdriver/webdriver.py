@@ -30,13 +30,15 @@ class WebDriver:
 
     def ensure_playwright_installed(self):
         try:
-            # Check if Playwright is already installed by trying to import it
             import playwright
+            # Ensure browsers are installed if not already
+            if not os.path.exists("/home/.cache/ms-playwright"):
+                raise ImportError
         except ImportError:
-            logger.info("Playwright not installed. Installing...")
+            logger.info("Playwright or its browsers not installed. Installing...")
             subprocess.run(["pip", "install", "playwright"], check=True)
-            subprocess.run(["playwright", "install"], check=True)
-            logger.info("Playwright installed successfully.")
+            subprocess.run(["playwright", "install", "chromium"], check=True)
+            logger.info("Playwright and its browsers installed successfully.")
 
     def createDriver(self, *args, **kwargs):
         timezone_id = get_localzone_name()
