@@ -3,7 +3,7 @@
     {
       "src": "src/oai_agent/oai_agent.py",
       "use": "@vercel/python",
-      "config": { "maxLambdaSize": "100mb" }
+      "config": { "maxLambdaSize": "100mb", "maxDuration": 60 }
     }
   ],
   "routes": [
