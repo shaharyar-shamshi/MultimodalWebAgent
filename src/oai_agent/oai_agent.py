@@ -57,7 +57,7 @@ def configure_agent(assistant_type: str) -> GPTAssistantAgent:
         logger.error(f"Unexpected error during agent configuration: {str(e)}")
         raise
 
-def register_functions(agent):
+async def register_functions(agent):
     """
     Register the functions used by the GPT Assistant Agent.
 
@@ -70,13 +70,13 @@ def register_functions(agent):
     logger.info("Registering functions...")
     function_map = {
         "analyze_content": analyze_content,
-        "click_element": click_element,
-        "go_back": go_back,
-        "input_text": input_text,
-        "jump_to_search_engine": jump_to_search_engine,
-        "read_url": read_url,
+        "click_element": await click_element,
+        "go_back": await go_back,
+        "input_text": await input_text,
+        "jump_to_search_engine": await jump_to_search_engine,
+        "read_url": await read_url,
         "scroll": scroll,
-        "wait": wait,
+        "wait": await wait,
         "save_to_file": save_to_file,
     }
     agent.register_function(function_map=function_map)
@@ -117,7 +117,7 @@ async def main(prompt=prompt):
     """
     try:
         gpt_assistant = configure_agent("BrowsingAgent")
-        register_functions(gpt_assistant)
+        await register_functions(gpt_assistant)
         user_proxy = create_user_proxy()
         await user_proxy.initiate_chat(gpt_assistant, message=prompt)
     except Exception as e:
