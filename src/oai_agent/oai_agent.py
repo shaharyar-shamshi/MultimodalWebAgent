@@ -1,4 +1,5 @@
 from http.server import BaseHTTPRequestHandler
+import json
 import logging
 
 from src.configs.logging.logging_config import setup_logging
@@ -103,7 +104,7 @@ def create_user_proxy():
     logger.info("User Proxy Agent created.")
     return user_proxy
 
-def main():
+def main(prompt = prompt):
     """
     Main function to run the GPT Assistant Agent.
 
@@ -126,6 +127,30 @@ class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
             main()
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write('Agent executed successfully'.encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write(f'An error occurred: {str(e)}'.encode('utf-8'))
+    def do_POST(self):
+        try:
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data)
+            prompt = data.get('prompt', '')
+
+            if not prompt:
+                self.send_response(400)
+                self.send_header('Content-type', 'text/plain')
+                self.end_headers()
+                self.wfile.write('Prompt is required.'.encode('utf-8'))
+                return
+
+            main(prompt)
             self.send_response(200)
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
