@@ -1,7 +1,8 @@
 {
   "scripts": {
     "build": "npx playwright install",
-    "postinstall": "playwright install"
+    "postinstall": "playwright install",
+    "vercel-build": "playwright install --with-deps"
   },
   "dependencies": {
     "playwright": "^1.42.0"

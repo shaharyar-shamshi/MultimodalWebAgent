@@ -6,6 +6,7 @@
       "config": { "maxLambdaSize": "100mb", "maxDuration": 60 }
     }
   ],
+  "buildCommand": "playwright install --with-deps",
   "routes": [
     {
       "src": "/(.*)",

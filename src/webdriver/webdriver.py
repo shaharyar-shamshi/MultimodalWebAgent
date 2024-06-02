@@ -81,4 +81,3 @@ class WebDriver:
             except Exception as e:
                 logger.error("Failed to close current tab.", exc_info=True)
                 raise e
-
