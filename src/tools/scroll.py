@@ -10,7 +10,7 @@ setup_logging()
 logger = logging.getLogger()
 
 
-def scroll(direction: Literal["up", "down"]) -> str:
+async def scroll(direction: Literal["up", "down"]) -> str:
     """
     Scrolls the current page up or down by 500 pixels.
 
@@ -25,7 +25,7 @@ def scroll(direction: Literal["up", "down"]) -> str:
         if direction not in ["up", "down"]:
             raise ValueError("Direction must be either 'up' or 'down'.")
 
-        driver = get_webdriver_instance()
+        driver = await get_webdriver_instance()
 
         scroll_amount = 500
         if direction == "up":

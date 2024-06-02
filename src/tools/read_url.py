@@ -8,9 +8,9 @@ setup_logging()
 logger = logging.getLogger()
 
 
-def read_url(url: str) -> str:
+async def read_url(url: str) -> str:
     """
-    Reads the content of a URL using a WebDriver instance adapted for Playwright, 
+    Reads the content of a URL using a WebDriver instance adapted for Playwright,
     executes a script to remove popups, and returns the current URL.
 
     Args:
@@ -24,7 +24,7 @@ def read_url(url: str) -> str:
             url = 'https://' + url
 
         logger.info(f"Reading URL: {url}")
-        driver = get_webdriver_instance()
+        driver = await get_webdriver_instance()
         driver.goto(url)
 
         return "Current URL is: " + driver.url + "\n"

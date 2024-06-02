@@ -9,11 +9,11 @@ setup_logging()
 logger = logging.getLogger()
 
 
-def go_back() -> str:
+async def go_back() -> str:
     """
     Navigates back one page in the browser history using a WebDriver instance, and returns a response string with the result of the action.
 
-    Args: 
+    Args:
         None
 
     Returns:
@@ -21,7 +21,7 @@ def go_back() -> str:
     """
 
     try:
-        driver = get_webdriver_instance()
+        driver = await get_webdriver_instance()
 
         logger.info("Navigating back 1 page...")
         driver.go_back()

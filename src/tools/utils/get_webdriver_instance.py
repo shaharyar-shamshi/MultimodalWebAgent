@@ -6,8 +6,7 @@ import logging
 setup_logging()
 logger = logging.getLogger()
 
-
-def get_webdriver_instance():
+async def get_webdriver_instance():
     """
     Returns an instance of the WebDriver.
 
@@ -18,7 +17,7 @@ def get_webdriver_instance():
         WebDriver: An instance of the WebDriver.
     """
     try:
-        return WebDriver.getInstance().getDriver()
+        return await WebDriver.getInstance().getDriver()
     except Exception as e:
         logger.error("Failed to get WebDriver instance: %s", e, exc_info=True)
         raise

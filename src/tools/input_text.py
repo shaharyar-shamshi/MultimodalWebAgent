@@ -16,7 +16,7 @@ setup_logging()
 logger = logging.getLogger(__name__)
 
 
-def input_text(query: str) -> str:
+async def input_text(query: str) -> str:
     """
     Sends keys to input fields based on a query and returns a result or error message.
 
@@ -27,7 +27,7 @@ def input_text(query: str) -> str:
         str: A response string indicating the success or failure of the input action.
     """
     try:
-        driver = get_webdriver_instance()
+        driver = await get_webdriver_instance()
         logger.info("Highlighting input elements on the page.")
         bbox_descriptions, bbox_coordinates, driver = highlight_elements(
             driver, "input")

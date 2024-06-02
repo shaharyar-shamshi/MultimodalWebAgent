@@ -9,7 +9,7 @@ setup_logging()
 logger = logging.getLogger()
 
 
-def jump_to_search_engine() -> str:
+async def jump_to_search_engine() -> str:
     """
     Navigates to the Google search engine using a WebDriver instance, and returns a response string with the result of the action.
 
@@ -21,7 +21,7 @@ def jump_to_search_engine() -> str:
     """
 
     try:
-        driver = get_webdriver_instance()
+        driver = await get_webdriver_instance()
 
         driver.goto("https://www.google.com")
 

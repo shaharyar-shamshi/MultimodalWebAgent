@@ -9,7 +9,7 @@ setup_logging()
 logger = logging.getLogger()
 
 
-def wait() -> str:
+async def wait() -> str:
     """
     Waits for 5 seconds and returns a response string with the result of the action and the current URL.
 
@@ -21,7 +21,7 @@ def wait() -> str:
     """
 
     try:
-        driver = get_webdriver_instance()
+        driver = await get_webdriver_instance()
 
         logger.info("Waiting 5 seconds...")
         time.sleep(5)

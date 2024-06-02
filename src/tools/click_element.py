@@ -14,7 +14,7 @@ setup_logging()
 logger = logging.getLogger()
 
 
-def click_element(query: str) -> str:
+async def click_element(query: str) -> str:
     """
     Clicks on a webpage element based on a user query, and returns a response string with the result of the action.
 
@@ -25,7 +25,7 @@ def click_element(query: str) -> str:
         str: A response string providing insights and answers regarding the information presented in the active browser window.
     """
     try:
-        driver = get_webdriver_instance()
+        driver = await get_webdriver_instance()
         logger.info("Highlighting clickable elements on the page.")
         bbox_descriptions, bbox_coordinates, driver = highlight_elements(
             driver, "click")
