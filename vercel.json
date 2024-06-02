@@ -1,12 +1,14 @@
 {
-  "functions": {
-    "api/oai_agent.py": { "maxDuration": 60 }
-  },
-  "buildCommand": "playwright install --with-deps",
+  "builds": [
+    {
+      "src": "Dockerfile",
+      "use": "@vercel/docker"
+    }
+  ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/api/oai_agent.py"
+      "dest": "api/oai_agent.py"
     }
   ]
 }
