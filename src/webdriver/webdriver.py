@@ -36,7 +36,7 @@ class WebDriver:
                 raise ImportError
         except ImportError:
             logger.info("Playwright or its browsers not installed. Installing...")
-            subprocess.run(["pip", "install", "playwright"], check=True)
+            subprocess.run(["pip3", "install", "playwright"], check=True)
             subprocess.run(["playwright", "install", "chromium"], check=True)
             logger.info("Playwright and its browsers installed successfully.")
 
