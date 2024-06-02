@@ -34,10 +34,12 @@ def run_async_function(coro):
     loop = asyncio.get_event_loop()
     if loop.is_running():
         # Running within an existing loop
-        return loop.create_task(coro)
+        future = asyncio.ensure_future(coro)
+        loop.run_until_complete(future)
+        return future.result()
     else:
         # No loop running, create a new one
-        return loop.run_until_complete(coro)
+        return asyncio.run(coro)
 
 def sync_read_url(url: str):
     return run_async_function(async_read_url(url))
