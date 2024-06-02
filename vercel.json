@@ -1,18 +1,12 @@
 {
-  "builds": [
-    {
-      "src": "api/oai_agent.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxDuration": 60,
-        "buildCommand": "./setup_playwright.sh && playwright install --with-deps"
-      }
-    }
-  ],
+  "functions": {
+    "api/oai_agent.py": { "maxDuration": 60 }
+  },
+  "buildCommand": "playwright install --with-deps",
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "api/oai_agent.py"
+      "dest": "/api/oai_agent.py"
     }
   ]
 }
