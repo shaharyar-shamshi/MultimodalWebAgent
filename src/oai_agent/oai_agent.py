@@ -70,13 +70,13 @@ async def register_functions(agent):
     logger.info("Registering functions...")
     function_map = {
         "analyze_content": analyze_content,
-        "click_element": await click_element,
-        "go_back": await go_back,
-        "input_text": await input_text,
-        "jump_to_search_engine": await jump_to_search_engine,
-        "read_url": await read_url,
+        "click_element": click_element,
+        "go_back": go_back,
+        "input_text": input_text,
+        "jump_to_search_engine": jump_to_search_engine,
+        "read_url": read_url,
         "scroll": scroll,
-        "wait": await wait,
+        "wait": wait,
         "save_to_file": save_to_file,
     }
     agent.register_function(function_map=function_map)
@@ -161,4 +161,3 @@ class handler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
             self.wfile.write(f'An error occurred: {str(e)}'.encode('utf-8'))
-
