@@ -108,7 +108,7 @@ async def register_functions(agent):
     """
     logger.info("Registering functions...")
     function_map = {
-        "analyze_content": sync_analyze_content,
+        "analyze_content": async_analyze_content,
         "click_element": sync_click_element,
         "go_back": sync_go_back,
         "input_text": sync_input_text,
@@ -116,7 +116,7 @@ async def register_functions(agent):
         "read_url": sync_read_url,
         "scroll": sync_scroll,
         "wait": sync_wait,
-        "save_to_file": sync_save_to_file,
+        "save_to_file": async_save_to_file,
     }
     agent.register_function(function_map=function_map)
     logger.info("Functions registered.")
