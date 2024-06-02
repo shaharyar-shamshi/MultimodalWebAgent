@@ -17,7 +17,8 @@ async def get_webdriver_instance():
         WebDriver: An instance of the WebDriver.
     """
     try:
-        return await WebDriver.getInstance().getDriver()
+        driver =  await WebDriver.getInstance()
+        return await driver.getDriver()
     except Exception as e:
         logger.error("Failed to get WebDriver instance: %s", e, exc_info=True)
         raise
