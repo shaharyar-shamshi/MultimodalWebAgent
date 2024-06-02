@@ -1,7 +1,6 @@
 from http.server import BaseHTTPRequestHandler
 import json
 import logging
-
 from src.configs.logging.logging_config import setup_logging
 from src.oai_agent.utils.load_assistant_id import load_assistant_id
 from src.oai_agent.utils.create_oai_agent import create_agent
@@ -16,6 +15,7 @@ from src.tools.input_text import input_text
 from src.tools.analyze_content import analyze_content
 from src.tools.save_to_file import save_to_file
 from src.oai_agent.utils.prompt import prompt
+from src.webdriver.webdriver import WebDriver
 
 import autogen
 from autogen.agentchat import AssistantAgent
@@ -27,15 +27,6 @@ setup_logging()
 logger = logging.getLogger(__name__)
 
 def configure_agent(assistant_type: str) -> GPTAssistantAgent:
-    """
-    Configure the GPT Assistant Agent with the specified tools and instructions.
-
-    Args:
-        None
-
-    Returns:
-        GPTAssistantAgent: An instance of the GPTAssistantAgent.
-    """
     try:
         logger.info("Configuring GPT Assistant Agent...")
         assistant_id = load_assistant_id(assistant_type)
@@ -57,15 +48,6 @@ def configure_agent(assistant_type: str) -> GPTAssistantAgent:
         raise
 
 def register_functions(agent):
-    """
-    Register the functions used by the GPT Assistant Agent.
-
-    Args:
-        agent (GPTAssistantAgent): An instance of the GPTAssistantAgent.
-
-    Returns:
-        None
-    """
     logger.info("Registering functions...")
     function_map = {
         "analyze_content": analyze_content,
@@ -82,15 +64,6 @@ def register_functions(agent):
     logger.info("Functions registered.")
 
 def create_user_proxy():
-    """
-    Create a User Proxy Agent.
-
-    Args:
-        None
-
-    Returns:
-        UserProxyAgent: An instance of the UserProxyAgent.
-    """
     logger.info("Creating User Proxy Agent...")
     user_proxy = autogen.UserProxyAgent(
         name="user_proxy",
@@ -104,22 +77,12 @@ def create_user_proxy():
     logger.info("User Proxy Agent created.")
     return user_proxy
 
-def main(prompt = prompt):
-    """
-    Main function to run the GPT Assistant Agent.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
+def main(prompt=prompt):
     try:
         gpt_assistant = configure_agent("BrowsingAgent")
         register_functions(gpt_assistant)
         user_proxy = create_user_proxy()
-        user_proxy.initiate_chat(
-            gpt_assistant, message=prompt)
+        user_proxy.initiate_chat(gpt_assistant, message=prompt)
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}")
 
@@ -136,6 +99,7 @@ class handler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
             self.wfile.write(f'An error occurred: {str(e)}'.encode('utf-8'))
+
     def do_POST(self):
         try:
             content_length = int(self.headers['Content-Length'])
@@ -160,4 +124,3 @@ class handler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
             self.wfile.write(f'An error occurred: {str(e)}'.encode('utf-8'))
-

@@ -1,6 +1,7 @@
 import os
 import locale
 import logging
+import subprocess
 from playwright.sync_api import sync_playwright
 from tzlocal import get_localzone_name
 from src.configs.logging.logging_config import setup_logging
@@ -27,11 +28,22 @@ class WebDriver:
             self.browser = None
             self.page = None
 
+    def ensure_playwright_installed(self):
+        try:
+            # Check if Playwright is already installed by trying to import it
+            import playwright
+        except ImportError:
+            logger.info("Playwright not installed. Installing...")
+            subprocess.run(["pip", "install", "playwright"], check=True)
+            subprocess.run(["playwright", "install"], check=True)
+            logger.info("Playwright installed successfully.")
+
     def createDriver(self, *args, **kwargs):
         timezone_id = get_localzone_name()
         system_locale = locale.getdefaultlocale()
 
         try:
+            self.ensure_playwright_installed()
             playwright = sync_playwright().start()
             browser = playwright.chromium.launch_persistent_context(
                 user_data_dir="/tmp/chrome_profile",  # Use /tmp directory
