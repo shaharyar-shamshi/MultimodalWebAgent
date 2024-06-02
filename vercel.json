@@ -1,11 +1,8 @@
 {
-  "builds": [
-    {
-      "src": "src/oai_agent/oai_agent.py",
-      "use": "@vercel/python",
-      "config": { "maxLambdaSize": "100mb", "maxDuration": 60 }
-    }
-  ],
+  "functions": {
+    "/src/oai_agent/oai_agent.py": { "maxDuration": 60}
+
+  },
   "buildCommand": "playwright install --with-deps",
   "routes": [
     {
