@@ -1,85 +1,47 @@
-from playwright.sync_api import sync_playwright
-from src.configs.logging.logging_config import setup_logging
+import os
 import locale
-from tzlocal import get_localzone_name
 import logging
+from playwright.async_api import async_playwright
+from tzlocal import get_localzone_name
+from src.configs.logging.logging_config import setup_logging
 
 setup_logging()
 logger = logging.getLogger()
 
 class WebDriver:
-    """
-    A singleton class representing a web driver instance.
-
-    Methods:
-        getInstance(*args, **kwargs) -> WebDriver:
-            Returns the singleton instance of the WebDriver class.
-        __init__(*args, **kwargs) -> None:
-            Initializes the WebDriver class.
-        createDriver(*args, **kwargs) -> None:
-            Creates a new browser instance and sets up the page.
-        getDriver() -> Page:
-            Returns the current page instance.
-        closeDriver() -> None:
-            Closes the browser instance and stops Playwright.
-        closeCurrentTab() -> None:
-            Closes the current tab (page) without affecting the browser instance.
-    """
-
     __instance = None
 
     @staticmethod
-    def getInstance(*args, **kwargs):
-        """
-        Returns the singleton instance of the WebDriver class.
-
-        Args:
-            *args: Variable length argument list.
-            **kwargs: Arbitrary keyword arguments.
-
-        Returns:
-            The singleton instance of the WebDriver class.
-        """
+    async def getInstance(*args, **kwargs):
         if WebDriver.__instance is None:
             WebDriver.__instance = WebDriver(*args, **kwargs)
+            await WebDriver.__instance.createDriver(*args, **kwargs)
         return WebDriver.__instance
 
     def __init__(self, *args, **kwargs):
-        """
-        Initializes the WebDriver class.
-
-        Args:
-            *args: Variable length argument list.
-            **kwargs: Arbitrary keyword arguments.
-
-        Returns:
-            None
-        """
         if WebDriver.__instance is not None:
             raise Exception("This class is a singleton!")
         else:
             WebDriver.__instance = self
-            self.createDriver(*args, **kwargs)
+            self.playwright = None
+            self.browser = None
+            self.page = None
 
-    def createDriver(self, *args, **kwargs):
-        """
-        Creates a new browser instance and sets up the page.
+    async def ensure_playwright_browsers_installed(self, playwright):
+        browsers_path = playwright.__dict__.get("browsers_path")
+        if not os.path.exists(browsers_path):
+            await playwright.install()
 
-        Args:
-            *args: Variable length argument list.
-            **kwargs: Arbitrary keyword arguments.
-
-        Returns:
-            None
-        """
+    async def createDriver(self, *args, **kwargs):
         timezone_id = get_localzone_name()
         system_locale = locale.getdefaultlocale()
 
         try:
-            playwright = sync_playwright().start()
-            browser = playwright.chromium.launch_persistent_context(
-                user_data_dir="src/data/chrome_profile",
-                headless=False,
+            playwright = await async_playwright().start()
+            await self.ensure_playwright_browsers_installed(playwright)
+            browser = await playwright.chromium.launch_persistent_context(
+                user_data_dir="/tmp/chrome_profile",  # Use /tmp directory
+                headless=True,
                 args=[
                     "--disable-gpu",
                     "--disable-dev-shm-usage",
@@ -92,58 +54,35 @@ class WebDriver:
             )
             self.playwright = playwright
             self.browser = browser
-            self.page = self.browser.pages[0] if self.browser.pages else self.browser.new_page()
-            self.page.set_viewport_size({"width": 960, "height": 1080})
+            self.page = await browser.new_page()
+            await self.page.set_viewport_size({"width": 960, "height": 1080})
             logger.info("Browser instance created successfully.")
         except Exception as e:
             logger.error("Failed to create browser instance.", exc_info=True)
             raise e
 
-    def getDriver(self):
-        """
-        Returns the current page instance.
-
-        Args:
-            None
-
-        Returns:
-            Page: The current page instance.
-        """
+    async def getDriver(self):
+        if self.browser is None:
+            await self.createDriver()
         return self.page
 
-    def closeDriver(self):
-        """
-        Closes the browser instance and stops Playwright.
-
-        Args:
-            None
-
-        Returns:
-            None
-        """
+    async def closeDriver(self):
         try:
-            self.browser.close()
-            self.playwright.stop()
+            if self.browser:
+                await self.browser.close()
+            if self.playwright:
+                await self.playwright.stop()
             logger.info("Browser instance closed successfully.")
         except Exception as e:
             logger.error("Failed to close browser instance.", exc_info=True)
             raise e
 
-    def closeCurrentTab(self):
-        """
-        Closes the current tab (page) without affecting the browser instance.
-
-        Args:
-            None
-
-        Returns:
-            None
-        """
+    async def closeCurrentTab(self):
         if self.page and not self.page.is_closed():
             try:
-                self.page.close()
-                self.page = self.browser.new_page()
-                self.page.set_viewport_size({"width": 960, "height": 1080})
+                await self.page.close()
+                self.page = await self.browser.new_page()
+                await self.page.set_viewport_size({"width": 960, "height": 1080})
                 logger.info("Current tab closed successfully.")
             except Exception as e:
                 logger.error("Failed to close current tab.", exc_info=True)
