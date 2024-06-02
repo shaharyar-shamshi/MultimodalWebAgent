@@ -28,8 +28,16 @@ setup_logging()
 logger = logging.getLogger(__name__)
 
 def run_async_function(coro):
+    """
+    Run an async function in the current event loop.
+    """
     loop = asyncio.get_event_loop()
-    return loop.run_until_complete(coro)
+    if loop.is_running():
+        # Running within an existing loop
+        return loop.create_task(coro)
+    else:
+        # No loop running, create a new one
+        return loop.run_until_complete(coro)
 
 def sync_read_url(url: str):
     return run_async_function(async_read_url(url))
