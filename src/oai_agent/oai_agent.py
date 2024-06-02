@@ -7,15 +7,15 @@ from src.configs.logging.logging_config import setup_logging
 from src.oai_agent.utils.load_assistant_id import load_assistant_id
 from src.oai_agent.utils.create_oai_agent import create_agent
 from src.autogen_configuration.autogen_config import GetConfig
-from src.tools.read_url import read_url
-from src.tools.scroll import scroll
-from src.tools.jump_to_search_engine import jump_to_search_engine
-from src.tools.go_back import go_back
-from src.tools.wait import wait
-from src.tools.click_element import click_element
-from src.tools.input_text import input_text
-from src.tools.analyze_content import analyze_content
-from src.tools.save_to_file import save_to_file
+from src.tools.read_url import read_url as async_read_url
+from src.tools.scroll import scroll as async_scroll
+from src.tools.jump_to_search_engine import jump_to_search_engine as async_jump_to_search_engine
+from src.tools.go_back import go_back as async_go_back
+from src.tools.wait import wait as async_wait
+from src.tools.click_element import click_element as async_click_element
+from src.tools.input_text import input_text as async_input_text
+from src.tools.analyze_content import analyze_content as async_analyze_content
+from src.tools.save_to_file import save_to_file as async_save_to_file
 from src.oai_agent.utils.prompt import prompt
 
 import autogen
@@ -26,6 +26,37 @@ import openai
 
 setup_logging()
 logger = logging.getLogger(__name__)
+
+def run_async_function(coro):
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(coro)
+
+def sync_read_url(url: str):
+    return run_async_function(async_read_url(url))
+
+def sync_scroll(direction: str):
+    return run_async_function(async_scroll(direction))
+
+def sync_jump_to_search_engine():
+    return run_async_function(async_jump_to_search_engine())
+
+def sync_go_back():
+    return run_async_function(async_go_back())
+
+def sync_wait():
+    return run_async_function(async_wait())
+
+def sync_click_element(query: str):
+    return run_async_function(async_click_element(query))
+
+def sync_input_text(query: str):
+    return run_async_function(async_input_text(query))
+
+def sync_analyze_content(query: str):
+    return run_async_function(async_analyze_content(query))
+
+def sync_save_to_file(data: str):
+    return run_async_function(async_save_to_file(data))
 
 def configure_agent(assistant_type: str) -> GPTAssistantAgent:
     """
@@ -69,15 +100,15 @@ async def register_functions(agent):
     """
     logger.info("Registering functions...")
     function_map = {
-        "analyze_content": analyze_content,
-        "click_element": click_element,
-        "go_back": go_back,
-        "input_text": input_text,
-        "jump_to_search_engine": jump_to_search_engine,
-        "read_url": read_url,
-        "scroll": scroll,
-        "wait": wait,
-        "save_to_file": save_to_file,
+        "analyze_content": sync_analyze_content,
+        "click_element": sync_click_element,
+        "go_back": sync_go_back,
+        "input_text": sync_input_text,
+        "jump_to_search_engine": sync_jump_to_search_engine,
+        "read_url": sync_read_url,
+        "scroll": sync_scroll,
+        "wait": sync_wait,
+        "save_to_file": sync_save_to_file,
     }
     agent.register_function(function_map=function_map)
     logger.info("Functions registered.")
